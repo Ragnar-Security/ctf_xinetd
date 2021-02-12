@@ -1,8 +1,7 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
-RUN sed -i "s/http:\/\/archive.ubuntu.com/http:\/\/mirrors.tuna.tsinghua.edu.cn/g" /etc/apt/sources.list && \
-    apt-get update && apt-get -y dist-upgrade && \
-    apt-get install -y lib32z1 xinetd
+RUN apt-get update && apt-get -y dist-upgrade && \
+    apt-get install -y lib32z1 xinetd git libglib2.0-dev libfdt-dev libpixman-1-dev zlib1g-dev libnfs-dev libiscsi-dev build-essential python3 ninja-build
 
 RUN useradd -m ctf
 
@@ -17,6 +16,18 @@ RUN mkdir /home/ctf/dev && \
     mknod /home/ctf/dev/random c 1 8 && \
     mknod /home/ctf/dev/urandom c 1 9 && \
     chmod 666 /home/ctf/dev/*
+
+RUN cd /home/ctf/ && \
+    git clone https://gitlab.com/qemu-project/qemu.git && \
+    cd /home/ctf/qemu && \
+    mkdir build && cd build && \
+    ../configure --target-list=arm-softmmu,arm-linux-user && \
+    make && make install
+
+#RUN mkdir /home/ctf/libs
+#COPY ./libpixman-1.so /home/ctf/libs/
+#COPY ./libpixman-1.so.0 /home/ctf/libs
+#COPY ./qemu-system-arm /home/ctf/libs
 
 RUN mkdir /home/ctf/bin && \
     cp /bin/sh /home/ctf/bin && \
@@ -34,6 +45,10 @@ RUN chown -R root:ctf /home/ctf && \
     chmod -R 750 /home/ctf && \
     chmod 740 /home/ctf/flag
 
+
+ENV PATH="/home/ctf/qemu/build:${PATH}"
+
 CMD ["/start.sh"]
 
 EXPOSE 9999
+EXPOSE 5900
