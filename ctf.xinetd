@@ -8,9 +8,9 @@ service ctf
     type        = UNLISTED
     port        = 9999
     bind        = 0.0.0.0
-    server      = /usr/sbin/chroot
+    server      = /home/ctf/qemu/build/qemu-system-arm
     # replace helloworld to your program
-    server_args = --userspec=1000:1000 /home/ctf ./qemu/build/qemu-system-arm -M raspi0 -kernel kernel.img -serial null -serial stdio
+    server_args = -M raspi0 -kernel /home/ctf/kernel.img -serial null -serial stdio -monitor /dev/null -chroot /home/ctf
     banner_fail = /etc/banner_fail
     # safety options
     per_source	= 10 # the maximum instances of this service per source IP address
